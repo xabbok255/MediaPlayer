@@ -24,20 +24,20 @@
         android:maxLines="1"
         android:paddingHorizontal="8dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="id/playPauseButton"
+        app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
         app:layout_constraintEnd_toStartOf="@id/time"
         app:layout_constraintStart_toEndOf="@id/playPauseButton"
         app:layout_constraintTop_toTopOf="@id/playPauseButton"
-        tools:text="(Moonsorrow) Hiidenpelto including Hapean Hiljaiset Vedet - Field Of The Devil include The Silent Waters Of Infamy" />
+        tools:text="(Moonsorrow) Field Of The Devil include The Silent Waters Of Infamy" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="id/playPauseButton"
+        app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/songName"
-        app:layout_constraintTop_toTopOf="id/playPauseButton"
+        app:layout_constraintTop_toTopOf="@id/playPauseButton"
         tools:text="12:35" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
