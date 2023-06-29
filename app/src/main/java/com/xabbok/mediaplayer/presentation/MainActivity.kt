@@ -1,8 +1,6 @@
 package com.xabbok.mediaplayer.presentation
 
-import android.net.Uri
 import android.os.Bundle
-import android.widget.MediaController
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -24,11 +22,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         viewModel.data.observe(this) {
             println(it.artist)
         }
-        viewModel.test()
+        viewModel.load()
 
         lifecycle.addObserver(observer)
 
-        binding.playVideo.setOnClickListener {
+        /*binding.playVideo.setOnClickListener {
             binding.viewView.apply {
                 setMediaController(MediaController(this@MainActivity))
                 setVideoURI(
@@ -51,6 +49,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 //mediaPlayer?.setDataSource(it.fileDescriptor, it.startOffset, it.length)
                 //     }
             }.play()
-        }
+        }*/
     }
 }

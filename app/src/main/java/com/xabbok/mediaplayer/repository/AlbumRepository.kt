@@ -5,4 +5,6 @@ import com.xabbok.mediaplayer.dto.MusicAlbum
 
 interface AlbumRepository {
     val data: LiveData<MusicAlbum>
+
+    suspend fun load()
 }
