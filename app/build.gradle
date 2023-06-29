@@ -12,6 +12,7 @@ android {
 
     buildFeatures.viewBinding = true
     buildFeatures.dataBinding = true
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId "com.xabbok.mediaplayer"
@@ -27,6 +28,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        all {
+            buildConfigField "String", "BASE_URL", '"https://raw.githubusercontent.com/netology-code/andad-homeworks/master/09_multimedia/data/"'
         }
     }
     compileOptions {
@@ -45,6 +49,14 @@ afterEvaluate {
 }
 
 dependencies {
+    //okhttp
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.11.0'
+
+    //retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
     //hilt
     implementation "com.google.dagger:hilt-android:$hilt_version"
     implementation 'androidx.hilt:hilt-common:1.0.0'
