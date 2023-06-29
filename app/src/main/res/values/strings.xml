@@ -2,4 +2,6 @@
     <string name="app_name">MediaPlayer</string>
     <string name="play_video">Play video</string>
     <string name="play_audio">Play audio</string>
+    <string name="album">АЛЬБОМ</string>
+    <string name="artist">Исполнитель:</string>
 </resources>
