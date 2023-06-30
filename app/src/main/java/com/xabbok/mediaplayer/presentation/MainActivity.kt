@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.xabbok.mediaplayer.MediaLifecycleObserver
 import com.xabbok.mediaplayer.R
 import com.xabbok.mediaplayer.adapter.MusicListViewAdapter
 import com.xabbok.mediaplayer.databinding.ActivityMainBinding
@@ -16,24 +15,21 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private val binding: ActivityMainBinding by viewBinding(ActivityMainBinding::bind)
     private val viewModel: MusicViewModel by viewModels()
-    private val observer = MediaLifecycleObserver()
-    private lateinit var adapter: MusicListViewAdapter
+    private var adapter: MusicListViewAdapter = MusicListViewAdapter(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding.trackList.adapter = adapter
+
         viewModel.data.observe(this) { album ->
             album?.let {
-                adapter = MusicListViewAdapter(this, it, this)
-                binding.trackList.adapter = adapter
-
+                adapter.setData(album)
 
                 binding.albumName.text = it.title
                 binding.genre.text = it.genre
                 binding.author.text = it.artist
                 binding.year.text = it.published
-
-                adapter.notifyDataSetChanged()
             }
         }
 

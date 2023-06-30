@@ -1,7 +1,6 @@
 package com.xabbok.mediaplayer.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +15,15 @@ import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
 import com.xabbok.mediaplayer.presentation.viewmodels.PlayingState
 
 class MusicListViewAdapter(
-    val context: Context,
-    private val dataSource: MusicAlbum,
     private val parent: AppCompatActivity
 ) : RecyclerView.Adapter<MusicListViewAdapter.MusicViewHolder>() {
     private val viewModel: MusicViewModel by parent.viewModels()
+    private var dataSource: MusicAlbum? = null
+
+    fun setData(album: MusicAlbum) {
+        dataSource = album
+        notifyDataSetChanged()
+    }
 
     /*
         добавляем сюда observer в onBindViewHolder, удаляем в onViewRecycled
@@ -34,11 +37,14 @@ class MusicListViewAdapter(
         return MusicViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = dataSource.tracks.size
+    override fun getItemCount(): Int = dataSource?.tracks?.size ?: 0
 
     @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
-        val item = dataSource.tracks[position]
+        if (dataSource == null)
+            return
+
+        val item = dataSource!!.tracks[position]
         holder.binding.apply {
             songName.text = item.file
             time.text = "15:12"
