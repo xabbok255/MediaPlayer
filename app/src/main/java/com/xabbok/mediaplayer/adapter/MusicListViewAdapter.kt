@@ -6,14 +6,20 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.xabbok.mediaplayer.R
 import com.xabbok.mediaplayer.databinding.AlbumItemBinding
 import com.xabbok.mediaplayer.dto.MusicAlbum
 import com.xabbok.mediaplayer.dto.MusicTrack
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
+import com.xabbok.mediaplayer.presentation.viewmodels.PlayingState
 
-class MusicListViewAdapter(val context: Context, private val dataSource: MusicAlbum, private val parent: AppCompatActivity) : RecyclerView.Adapter<MusicListViewAdapter.MusicViewHolder>() {
+class MusicListViewAdapter(
+    val context: Context,
+    private val dataSource: MusicAlbum,
+    private val parent: AppCompatActivity
+) : RecyclerView.Adapter<MusicListViewAdapter.MusicViewHolder>() {
     private val viewModel: MusicViewModel by parent.viewModels()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
@@ -30,23 +36,39 @@ class MusicListViewAdapter(val context: Context, private val dataSource: MusicAl
         holder.binding.apply {
             songName.text = item.file
             time.text = "15:12"
+            //playPauseButton.setImageResource(if (item.playing) R.drawable.pause_button else R.drawable.play_button)
+        }
+
+        holder.binding.playPauseButton.setOnClickListener {
+            viewModel.playPause(item)
         }
 
         setupSubscribes(holder, item)
     }
 
     private fun setupSubscribes(holder: MusicViewHolder, currentMusic: MusicTrack) {
-        viewModel.currentPlayingTrack.observe(parent) {
-            if (it?.id == currentMusic.id) {
-                holder.binding.playPauseButton.setImageResource(R.drawable.pause_button)
-            } else {
+
+        viewModel.currentPlayingState.observe(holder.itemView.context as LifecycleOwner) {
+            it?.let { state ->
                 holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
+
+                when (state) {
+                    is PlayingState.Paused -> if (state.track.id == currentMusic.id) {
+                        holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
+                    }
+
+                    is PlayingState.Playing -> if (state.track.id == currentMusic.id) {
+                        holder.binding.playPauseButton.setImageResource(R.drawable.pause_button)
+                    }
+
+                    PlayingState.Stopped -> {
+                        holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
+                    }
+                }
             }
         }
     }
 
     class MusicViewHolder(val binding: AlbumItemBinding) :
-        RecyclerView.ViewHolder(binding.root){
-
-    }
+        RecyclerView.ViewHolder(binding.root)
 }

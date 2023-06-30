@@ -13,37 +13,59 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MusicViewModel @Inject constructor(private val repository: AlbumRepository) : ViewModel() {
-    private val _data: MutableLiveData<MusicAlbum> = MutableLiveData()
-    val data: LiveData<MusicAlbum>
-        get() = _data
+    val data: LiveData<MusicAlbum> = repository.data
 
-    private val _currentPlayingTrack: MutableLiveData<MusicTrack?> = MutableLiveData()
-    val currentPlayingTrack: LiveData<MusicTrack?>
-        get() = _currentPlayingTrack
-
-    private val _currentPlayingState: MutableLiveData<PlayingState> = MutableLiveData()
+    private val _currentPlayingState: MutableLiveData<PlayingState> =
+        MutableLiveData(PlayingState.Stopped)
     val currentPlayingState: LiveData<PlayingState>
         get() = _currentPlayingState
 
-    fun startPlayingTrack(track: MusicTrack) {
-        if (_currentPlayingTrack.value?.id != track.id) {
-            _currentPlayingTrack.value = track
+    fun playPauseCommon() {
+        _currentPlayingState.value?.let { state ->
+            when (state) {
+                is PlayingState.Paused -> {
+                    _currentPlayingState.value = PlayingState.Playing(state.track)
+                }
+
+                is PlayingState.Playing -> {
+                    _currentPlayingState.value = PlayingState.Paused(state.track)
+                }
+
+                PlayingState.Stopped -> {
+                    (data.value?.tracks?.firstOrNull())?.let {
+                        _currentPlayingState.value = PlayingState.Playing(it)
+                    }
+                }
+            }
+
+
         }
-
-        _currentPlayingState.value = PlayingState.Playing
     }
 
-    fun stopPlayingTrack() {
-        _currentPlayingTrack.value = null
-        _currentPlayingState.value = PlayingState.Stopped
-    }
+    fun playPause(newTrack: MusicTrack) {
+        _currentPlayingState.value?.let { state ->
+            when (state) {
+                is PlayingState.Playing -> {
+                    if (state.track.id == newTrack.id) {
+                        _currentPlayingState.value =
+                            PlayingState.Paused(newTrack)
+                    } else {
+                        _currentPlayingState.value =
+                            PlayingState.Playing(newTrack)
+                    }
+                }
 
-    fun pausePlayingTrack() {
-        _currentPlayingState.value = PlayingState.Paused
-    }
+                is PlayingState.Paused -> {
+                    _currentPlayingState.value =
+                        PlayingState.Playing(newTrack)
+                }
 
-    fun test() {
-        _data.value = MusicAlbum(0, "1", "2", "3", "4", "5", emptyList())
+                is PlayingState.Stopped -> {
+                    _currentPlayingState.value =
+                        PlayingState.Playing(newTrack)
+                }
+            }
+        }
     }
 
     fun load() {
@@ -54,7 +76,7 @@ class MusicViewModel @Inject constructor(private val repository: AlbumRepository
 }
 
 sealed class PlayingState() {
-    object Playing : PlayingState()
-    object Paused : PlayingState()
+    class Playing(val track: MusicTrack) : PlayingState()
+    class Paused(val track: MusicTrack) : PlayingState()
     object Stopped : PlayingState()
 }

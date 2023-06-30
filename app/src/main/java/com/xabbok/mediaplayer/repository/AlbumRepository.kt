@@ -7,6 +7,4 @@ interface AlbumRepository {
     val data: LiveData<MusicAlbum>
 
     suspend fun load()
-    fun setIdWithPlayState(id: Int)
-    fun resetPlayState()
 }
