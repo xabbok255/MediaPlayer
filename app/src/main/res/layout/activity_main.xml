@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp"
     tools:context=".presentation.MainActivity">
@@ -12,7 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="8dp"
-        android:text="@string/album" />
+
+        android:text="@string/album"
+        android:textSize="32sp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/albumName"
@@ -33,7 +35,8 @@
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="@string/artist" />
+            android:text="@string/artist"
+            android:textSize="24sp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/author"
@@ -41,6 +44,7 @@
             android:layout_height="match_parent"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="24sp"
             android:textStyle="bold"
             tools:text="Moonsorrow" />
     </LinearLayout>
@@ -54,6 +58,7 @@
             android:id="@+id/year"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:textSize="18sp"
             tools:text="2015" />
 
         <Space
@@ -66,6 +71,7 @@
             android:layout_height="match_parent"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="18sp"
             tools:text="electronic" />
     </LinearLayout>
 
@@ -77,11 +83,11 @@
         tools:src="@drawable/pause_button" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/trackList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/album_item"
-        tools:itemCount="100"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-/>
+        tools:itemCount="100"
+        tools:listitem="@layout/album_item" />
 
 </LinearLayout>

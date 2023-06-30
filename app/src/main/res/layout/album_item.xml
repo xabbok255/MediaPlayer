@@ -8,8 +8,8 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/playPauseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,6 +24,7 @@
         android:maxLines="1"
         android:paddingHorizontal="8dp"
         android:textStyle="bold"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="@id/playPauseButton"
         app:layout_constraintEnd_toStartOf="@id/time"
         app:layout_constraintStart_toEndOf="@id/playPauseButton"
@@ -38,6 +39,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/songName"
         app:layout_constraintTop_toTopOf="@id/playPauseButton"
+        android:textSize="18sp"
         tools:text="12:35" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
