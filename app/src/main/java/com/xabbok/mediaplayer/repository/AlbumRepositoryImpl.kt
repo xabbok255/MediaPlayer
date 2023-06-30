@@ -34,4 +34,16 @@ class AlbumRepositoryImpl @Inject constructor(
             it.printStackTrace()
         }
     }
+
+    override fun setIdWithPlayState(id: Int) {
+        _data.value = _data.value?.copy(tracks = _data.value?.tracks?.map {
+            return@map it.copy(playing = (id == it.id))
+        }.orEmpty())
+    }
+
+    override fun resetPlayState() {
+        _data.value = _data.value?.copy(tracks = _data.value?.tracks?.map {
+            return@map it.copy(playing = false)
+        }.orEmpty())
+    }
 }
