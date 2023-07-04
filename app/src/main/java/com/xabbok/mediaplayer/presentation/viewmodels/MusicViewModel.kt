@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xabbok.mediaplayer.dto.MusicAlbum
 import com.xabbok.mediaplayer.dto.MusicTrack
+import com.xabbok.mediaplayer.mediaplayer.MediaPlayerManager
 import com.xabbok.mediaplayer.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -20,20 +21,36 @@ class MusicViewModel @Inject constructor(private val repository: AlbumRepository
     val currentPlayingState: LiveData<PlayingState>
         get() = _currentPlayingState
 
+    @Inject
+    lateinit var mediaPlayerManager: MediaPlayerManager
+
+    fun pause() {
+        _currentPlayingState.value?.let { state ->
+            when (state) {
+                is PlayingState.Paused -> {}
+                is PlayingState.Playing -> mediaPlayerManager.pause()
+                PlayingState.Stopped -> {}
+            }
+        }
+    }
+
     fun playPauseCommon() {
         _currentPlayingState.value?.let { state ->
             when (state) {
                 is PlayingState.Paused -> {
                     _currentPlayingState.value = PlayingState.Playing(state.track)
+                    mediaPlayerManager.resume()
                 }
 
                 is PlayingState.Playing -> {
                     _currentPlayingState.value = PlayingState.Paused(state.track)
+                    mediaPlayerManager.pause()
                 }
 
                 PlayingState.Stopped -> {
                     (data.value?.tracks?.firstOrNull())?.let {
                         _currentPlayingState.value = PlayingState.Playing(it)
+                        mediaPlayerManager.play(it)
                     }
                 }
             }
@@ -49,20 +66,30 @@ class MusicViewModel @Inject constructor(private val repository: AlbumRepository
                     if (state.track.id == newTrack.id) {
                         _currentPlayingState.value =
                             PlayingState.Paused(newTrack)
+                        mediaPlayerManager.pause()
                     } else {
                         _currentPlayingState.value =
                             PlayingState.Playing(newTrack)
+                        mediaPlayerManager.play(newTrack)
                     }
                 }
 
                 is PlayingState.Paused -> {
-                    _currentPlayingState.value =
-                        PlayingState.Playing(newTrack)
+                    if (state.track.id == newTrack.id) {
+                        _currentPlayingState.value =
+                            PlayingState.Playing(newTrack)
+                        mediaPlayerManager.resume()
+                    } else {
+                        _currentPlayingState.value =
+                            PlayingState.Playing(newTrack)
+                        mediaPlayerManager.play(newTrack)
+                    }
                 }
 
                 is PlayingState.Stopped -> {
                     _currentPlayingState.value =
                         PlayingState.Playing(newTrack)
+                    mediaPlayerManager.play(newTrack)
                 }
             }
         }

@@ -36,9 +36,17 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         viewModel.currentPlayingState.observe(this) {
             it?.let { state ->
                 when (state) {
-                    is PlayingState.Paused -> binding.playPauseButton.setImageResource(R.drawable.play_button)
-                    is PlayingState.Playing -> binding.playPauseButton.setImageResource(R.drawable.pause_button)
-                    PlayingState.Stopped -> binding.playPauseButton.setImageResource(R.drawable.play_button)
+                    is PlayingState.Paused -> {
+                        binding.playPauseButton.setImageResource(R.drawable.play_button)
+                    }
+
+                    is PlayingState.Playing -> {
+                        binding.playPauseButton.setImageResource(R.drawable.pause_button)
+                    }
+
+                    PlayingState.Stopped -> {
+                        binding.playPauseButton.setImageResource(R.drawable.play_button)
+                    }
                 }
             }
         }
