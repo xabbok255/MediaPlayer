@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="statusBarColor">@color/m3_sys_color_light_primary</color>
+    <color name="repeatButtonActive">@android:color/holo_orange_light</color>
+    <color name="repeatButtonInactive">@android:color/darker_gray</color>
 </resources>

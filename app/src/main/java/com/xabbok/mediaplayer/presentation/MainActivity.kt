@@ -53,6 +53,19 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             }
         }
 
+        lifecycleScope.launch {
+            viewModel.loopPlaybackMode.collect {
+                binding.repeatButtonBottom.apply {
+                    @Suppress("DEPRECATION")
+                    setColorFilter(
+                        if (it)
+                            resources.getColor(R.color.repeatButtonActive)
+                        else resources.getColor(R.color.repeatButtonInactive)
+                    )
+                }
+            }
+        }
+
         viewModel.currentPlayingState.observe(this) {
             it?.let { state ->
                 when (state) {
@@ -69,6 +82,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     }
                 }
             }
+        }
+
+        binding.repeatButtonBottom.setOnClickListener {
+            viewModel.changeLoopPlaybackMode()
         }
 
         binding.playPauseButtonBottom.setOnClickListener {

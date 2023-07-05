@@ -10,6 +10,8 @@ import com.xabbok.mediaplayer.mediaplayer.MediaPlayerEventListener
 import com.xabbok.mediaplayer.mediaplayer.MediaPlayerManager
 import com.xabbok.mediaplayer.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.max
@@ -27,6 +29,10 @@ class MusicViewModel @Inject constructor(
     val currentPlayingState: LiveData<PlayingState>
         get() = _currentPlayingState
 
+    private val _loopPlaybackMode = MutableStateFlow<Boolean>(false)
+    val loopPlaybackMode: StateFlow<Boolean>
+        get() = _loopPlaybackMode
+
     val playingProgressStateFlow = mediaPlayerManager.playingProgressStateFlow
 
     init {
@@ -35,6 +41,10 @@ class MusicViewModel @Inject constructor(
                 nextTrack()
             }
         })
+    }
+
+    fun changeLoopPlaybackMode() {
+        _loopPlaybackMode.value = !_loopPlaybackMode.value
     }
 
     fun seek(percent: Float) {
@@ -79,7 +89,14 @@ class MusicViewModel @Inject constructor(
                             _currentPlayingState.value = PlayingState.Playing(it)
                             mediaPlayerManager.play(it)
                         } ?: let {
-                        _currentPlayingState.value = PlayingState.Stopped
+                        if (_loopPlaybackMode.value) {
+                            (data.value?.tracks?.firstOrNull())?.let {
+                                _currentPlayingState.value = PlayingState.Playing(it)
+                                mediaPlayerManager.play(it)
+                            }
+                        } else {
+                            _currentPlayingState.value = PlayingState.Stopped
+                        }
                     }
                 }
 
