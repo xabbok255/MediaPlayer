@@ -12,6 +12,8 @@ import com.xabbok.mediaplayer.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
+import kotlin.math.min
 
 @HiltViewModel
 class MusicViewModel @Inject constructor(
@@ -25,12 +27,18 @@ class MusicViewModel @Inject constructor(
     val currentPlayingState: LiveData<PlayingState>
         get() = _currentPlayingState
 
+    val playingProgressStateFlow = mediaPlayerManager.playingProgressStateFlow
+
     init {
         mediaPlayerManager.setEventListener(object : MediaPlayerEventListener {
             override fun onTrackEnded() {
                 nextTrack()
             }
         })
+    }
+
+    fun seek(percent: Float) {
+        mediaPlayerManager.seek(min(max(percent, 0f), 1f))
     }
 
     fun prevTrack() {

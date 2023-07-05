@@ -1,8 +1,11 @@
 package com.xabbok.mediaplayer.presentation
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.MotionEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.xabbok.mediaplayer.R
 import com.xabbok.mediaplayer.adapter.MusicListViewAdapter
@@ -10,6 +13,7 @@ import com.xabbok.mediaplayer.databinding.ActivityMainBinding
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
 import com.xabbok.mediaplayer.presentation.viewmodels.PlayingState
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(R.layout.activity_main) {
@@ -17,6 +21,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     private val viewModel: MusicViewModel by viewModels()
     private var adapter: MusicListViewAdapter = MusicListViewAdapter(this)
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,6 +35,21 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 binding.genre.text = it.genre
                 binding.author.text = it.artist
                 binding.year.text = it.published
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.playingProgressStateFlow.collect {
+                binding.progressBar.apply {
+                    if (it.duration == 0) {
+                        isEnabled = false
+                        progress = 0
+                    } else {
+                        isEnabled = true
+                        max = it.duration
+                        progress = it.currentPos
+                    }
+                }
             }
         }
 
@@ -61,6 +81,18 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
         binding.prevButtonBottom.setOnClickListener {
             viewModel.prevTrack()
+        }
+
+        binding.progressBar.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val mouseX = event.x
+                val totalWidth = binding.progressBar.width.toFloat()
+                val progress = mouseX / totalWidth
+
+
+                viewModel.seek(progress)
+            }
+            true
         }
 
         viewModel.load()
