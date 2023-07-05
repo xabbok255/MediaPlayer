@@ -5,22 +5,17 @@ import com.xabbok.mediaplayer.dto.MusicTrack
 import javax.inject.Inject
 
 class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlayer) {
-    /*init {
+    init {
+        mediaPlayer.setOnCompletionListener {
+            eventListener?.onTrackEnded()
+        }
+    }
 
-        lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                when (event) {
-                    Lifecycle.Event.ON_RESUME -> {
-                        if (!paused) play()
-                    }
+    private var eventListener: MediaPlayerEventListener? = null
 
-                    Lifecycle.Event.ON_PAUSE -> pause()
-                    Lifecycle.Event.ON_STOP -> stop()
-                    else -> {}
-                }
-            }
-        })
-    }*/
+    fun setEventListener(listener: MediaPlayerEventListener) {
+        eventListener = listener
+    }
 
     fun resume() {
         mediaPlayer.start()

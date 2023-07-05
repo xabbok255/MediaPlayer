@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xabbok.mediaplayer.dto.MusicAlbum
 import com.xabbok.mediaplayer.dto.MusicTrack
+import com.xabbok.mediaplayer.mediaplayer.MediaPlayerEventListener
 import com.xabbok.mediaplayer.mediaplayer.MediaPlayerManager
 import com.xabbok.mediaplayer.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MusicViewModel @Inject constructor(private val repository: AlbumRepository) : ViewModel() {
+class MusicViewModel @Inject constructor(
+    private val repository: AlbumRepository,
+    private val mediaPlayerManager: MediaPlayerManager
+) : ViewModel() {
     val data: LiveData<MusicAlbum> = repository.data
 
     private val _currentPlayingState: MutableLiveData<PlayingState> =
@@ -21,14 +25,70 @@ class MusicViewModel @Inject constructor(private val repository: AlbumRepository
     val currentPlayingState: LiveData<PlayingState>
         get() = _currentPlayingState
 
-    @Inject
-    lateinit var mediaPlayerManager: MediaPlayerManager
+    init {
+        mediaPlayerManager.setEventListener(object : MediaPlayerEventListener {
+            override fun onTrackEnded() {
+                nextTrack()
+            }
+        })
+    }
+
+    fun prevTrack() {
+        mediaPlayerManager.stop()
+
+        _currentPlayingState.value?.let { state ->
+            when (state) {
+                is PlayingState.PlayingPaused -> {
+                    repository.data.value?.tracks?.indexOf(state.track)
+                        ?.let { currentIndex ->
+                            repository.data.value?.tracks?.getOrNull(currentIndex - 1)
+                        }
+                        ?.let {
+                            _currentPlayingState.value = PlayingState.Playing(it)
+                            mediaPlayerManager.play(it)
+                        } ?: let {
+                        _currentPlayingState.value = PlayingState.Stopped
+                    }
+                }
+
+                is PlayingState.Stopped -> {}
+            }
+        }
+    }
+
+
+    fun nextTrack() {
+        mediaPlayerManager.stop()
+
+        _currentPlayingState.value?.let { state ->
+            when (state) {
+                is PlayingState.PlayingPaused -> {
+                    repository.data.value?.tracks?.indexOf(state.track)
+                        ?.let { currentIndex ->
+                            repository.data.value?.tracks?.getOrNull(currentIndex + 1)
+                        }
+                        ?.let {
+                            _currentPlayingState.value = PlayingState.Playing(it)
+                            mediaPlayerManager.play(it)
+                        } ?: let {
+                        _currentPlayingState.value = PlayingState.Stopped
+                    }
+                }
+
+                is PlayingState.Stopped -> {}
+            }
+        }
+    }
 
     fun pause() {
         _currentPlayingState.value?.let { state ->
             when (state) {
                 is PlayingState.Paused -> {}
-                is PlayingState.Playing -> mediaPlayerManager.pause()
+                is PlayingState.Playing -> {
+                    mediaPlayerManager.pause()
+                    _currentPlayingState.value = PlayingState.Paused(state.track)
+                }
+
                 PlayingState.Stopped -> {}
             }
         }
@@ -103,7 +163,8 @@ class MusicViewModel @Inject constructor(private val repository: AlbumRepository
 }
 
 sealed class PlayingState() {
-    class Playing(val track: MusicTrack) : PlayingState()
-    class Paused(val track: MusicTrack) : PlayingState()
+    sealed class PlayingPaused(open val track: MusicTrack) : PlayingState()
+    class Playing(override val track: MusicTrack) : PlayingPaused(track)
+    class Paused(override val track: MusicTrack) : PlayingPaused(track)
     object Stopped : PlayingState()
 }

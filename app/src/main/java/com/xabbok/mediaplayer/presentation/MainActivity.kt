@@ -37,51 +37,32 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             it?.let { state ->
                 when (state) {
                     is PlayingState.Paused -> {
-                        binding.playPauseButton.setImageResource(R.drawable.play_button)
+                        binding.playPauseButtonBottom.setImageResource(R.drawable.play_button)
                     }
 
                     is PlayingState.Playing -> {
-                        binding.playPauseButton.setImageResource(R.drawable.pause_button)
+                        binding.playPauseButtonBottom.setImageResource(R.drawable.pause_button)
                     }
 
                     PlayingState.Stopped -> {
-                        binding.playPauseButton.setImageResource(R.drawable.play_button)
+                        binding.playPauseButtonBottom.setImageResource(R.drawable.play_button)
                     }
                 }
             }
         }
 
-        binding.playPauseButton.setOnClickListener {
+        binding.playPauseButtonBottom.setOnClickListener {
             viewModel.playPauseCommon()
         }
 
-        viewModel.load()
-
-        /*lifecycle.addObserver(observer)
-
-        binding.playVideo.setOnClickListener {
-            binding.viewView.apply {
-                setMediaController(MediaController(this@MainActivity))
-                setVideoURI(
-                    Uri.parse("https://test-videos.co.uk/vids/sintel/mp4/h264/1080/Sintel_1080_10s_1MB.mp4")
-                )
-                setOnPreparedListener {
-                    start()
-                }
-                setOnCompletionListener {
-                    stopPlayback()
-                }
-            }
+        binding.nextButtonBottom.setOnClickListener {
+            viewModel.nextTrack()
         }
 
-        binding.playAudio.setOnClickListener {
-            observer.apply {
-                mediaPlayer?.setDataSource("https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/A_Crooked_Pulse/A_Crooked_Pulse/A_Crooked_Pulse_-_01_-_Dark_Spots.mp3")
+        binding.prevButtonBottom.setOnClickListener {
+            viewModel.prevTrack()
+        }
 
-                //resources.openRawResourceFd(R.raw.volchok).use {
-                //mediaPlayer?.setDataSource(it.fileDescriptor, it.startOffset, it.length)
-                //     }
-            }.play()
-        }*/
+        viewModel.load()
     }
 }
