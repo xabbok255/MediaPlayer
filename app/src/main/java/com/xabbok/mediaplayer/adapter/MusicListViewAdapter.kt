@@ -58,17 +58,25 @@ class MusicListViewAdapter(
             it.let { state ->
                 holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
 
+                val backgroundColorSelected = R.color.listItemActiveBackground
+                val backgroundColorUnselected = R.color.listItemBackground
+
+                holder.binding.root.setBackgroundResource(backgroundColorUnselected)
+
                 when (state) {
                     is PlayingState.Paused -> if (state.track.id == item.id) {
                         holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
+                        holder.binding.root.setBackgroundResource(backgroundColorSelected)
                     }
 
                     is PlayingState.Playing -> if (state.track.id == item.id) {
                         holder.binding.playPauseButton.setImageResource(R.drawable.pause_button)
+                        holder.binding.root.setBackgroundResource(backgroundColorSelected)
                     }
 
                     PlayingState.Stopped -> {
                         holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
+
                     }
                 }
             }
@@ -78,7 +86,6 @@ class MusicListViewAdapter(
         observers.put(holder.itemView, observer)
         viewModel.currentPlayingState.observe(parent, observer)
     }
-
 
     override fun onViewRecycled(holder: MusicViewHolder) {
         //удаляем неиспользуемые observer

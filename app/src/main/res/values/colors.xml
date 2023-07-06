@@ -11,4 +11,6 @@
     <color name="statusBarColor">@color/m3_sys_color_light_primary</color>
     <color name="repeatButtonActive">@android:color/holo_orange_light</color>
     <color name="repeatButtonInactive">@android:color/darker_gray</color>
+    <color name="listItemActiveBackground">#10000000</color>
+    <color name="listItemBackground">#00000000</color>
 </resources>
