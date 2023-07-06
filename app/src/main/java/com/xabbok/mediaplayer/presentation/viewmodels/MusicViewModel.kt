@@ -9,6 +9,7 @@ import com.xabbok.mediaplayer.mediaplayer.MediaPlayerEventListener
 import com.xabbok.mediaplayer.mediaplayer.MediaPlayerManager
 import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.repository.AlbumRepository
+import com.xabbok.mediaplayer.service.MediaInfoService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +21,8 @@ import kotlin.math.min
 @HiltViewModel
 class MusicViewModel @Inject constructor(
     private val repository: AlbumRepository,
-    private val mediaPlayerManager: MediaPlayerManager
+    private val mediaPlayerManager: MediaPlayerManager,
+    private val mediaInfoService: MediaInfoService
 ) : ViewModel() {
     val data: LiveData<MusicAlbum> = repository.data
 
@@ -38,6 +40,12 @@ class MusicViewModel @Inject constructor(
                 nextTrack()
             }
         })
+    }
+
+    fun processMediaDurationInfo(inputTrack: MusicTrack) {
+        mediaInfoService.processMedia(inputTrack) { track, duration ->
+            repository.setTrackDuration(track, duration)
+        }
     }
 
     fun changeLoopPlaybackMode() {

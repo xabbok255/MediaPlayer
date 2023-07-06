@@ -48,7 +48,10 @@ class MusicListViewAdapter(
         val item = dataSource!!.tracks[position]
         holder.binding.apply {
             songName.text = item.file
-            time.text = if (item.duration > 0) formatTime(item.duration) else ""
+            time.text = if (item.duration > 0) formatTime(item.duration) else {
+                viewModel.processMediaDurationInfo(item)
+                ""
+            }
         }
 
         val playOnClickListener = View.OnClickListener {
