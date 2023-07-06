@@ -13,6 +13,7 @@ import com.xabbok.mediaplayer.databinding.AlbumItemBinding
 import com.xabbok.mediaplayer.dto.MusicAlbum
 import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
+import com.xabbok.mediaplayer.utils.formatTime
 
 class MusicListViewAdapter(
     private val parent: AppCompatActivity
@@ -47,7 +48,7 @@ class MusicListViewAdapter(
         val item = dataSource!!.tracks[position]
         holder.binding.apply {
             songName.text = item.file
-            time.text = "15:12"
+            time.text = if (item.duration > 0) formatTime(item.duration) else ""
         }
 
         val playOnClickListener = View.OnClickListener {
@@ -71,11 +72,15 @@ class MusicListViewAdapter(
                     is PlayingState.Paused -> if (state.track.id == item.id) {
                         holder.binding.playPauseButton.setImageResource(R.drawable.play_button)
                         holder.binding.root.setBackgroundResource(backgroundColorSelected)
+                        holder.binding.time.text =
+                            if (state.track.duration > 0) formatTime(state.track.duration) else ""
                     }
 
                     is PlayingState.Playing -> if (state.track.id == item.id) {
                         holder.binding.playPauseButton.setImageResource(R.drawable.pause_button)
                         holder.binding.root.setBackgroundResource(backgroundColorSelected)
+                        holder.binding.time.text =
+                            if (state.track.duration > 0) formatTime(state.track.duration) else ""
                     }
 
                     PlayingState.Stopped -> {
