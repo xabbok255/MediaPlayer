@@ -1,13 +1,13 @@
 package com.xabbok.mediaplayer.presentation.viewmodels
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.xabbok.mediaplayer.dto.MusicAlbum
 import com.xabbok.mediaplayer.dto.MusicTrack
 import com.xabbok.mediaplayer.mediaplayer.MediaPlayerEventListener
 import com.xabbok.mediaplayer.mediaplayer.MediaPlayerManager
+import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.repository.AlbumRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,10 +24,7 @@ class MusicViewModel @Inject constructor(
 ) : ViewModel() {
     val data: LiveData<MusicAlbum> = repository.data
 
-    private val _currentPlayingState: MutableLiveData<PlayingState> =
-        MutableLiveData(PlayingState.Stopped)
-    val currentPlayingState: LiveData<PlayingState>
-        get() = _currentPlayingState
+    val currentPlayingState: LiveData<PlayingState> = mediaPlayerManager.currentPlayingState
 
     private val _loopPlaybackMode = MutableStateFlow<Boolean>(false)
     val loopPlaybackMode: StateFlow<Boolean>
@@ -51,133 +48,80 @@ class MusicViewModel @Inject constructor(
         mediaPlayerManager.seek(min(max(percent, 0f), 1f))
     }
 
+    fun isFirst(track: MusicTrack): Boolean {
+        return repository.data.value?.tracks?.first()?.id == track.id
+    }
+
+    fun isLast(track: MusicTrack): Boolean {
+        return repository.data.value?.tracks?.last()?.id == track.id
+    }
+
+    private fun getPrevTrack(track: MusicTrack): MusicTrack? {
+        return repository.data.value?.tracks?.elementAtOrNull(
+            repository.data.value?.tracks?.indexOf(
+                track
+            )!! - 1
+        )
+    }
+
+    private fun getNextTrack(track: MusicTrack): MusicTrack? {
+        return repository.data.value?.tracks?.elementAtOrNull(
+            repository.data.value?.tracks?.indexOf(
+                track
+            )!! + 1
+        )
+    }
+
     fun prevTrack() {
-        mediaPlayerManager.stop()
-
-        _currentPlayingState.value?.let { state ->
-            when (state) {
-                is PlayingState.PlayingPaused -> {
-                    repository.data.value?.tracks?.indexOf(state.track)
-                        ?.let { currentIndex ->
-                            repository.data.value?.tracks?.getOrNull(currentIndex - 1)
-                        }
-                        ?.let {
-                            _currentPlayingState.value = PlayingState.Playing(it)
-                            mediaPlayerManager.play(it)
-                        } ?: let {
-                        _currentPlayingState.value = PlayingState.Stopped
-                    }
-                }
-
-                is PlayingState.Stopped -> {}
+        (currentPlayingState.value as? PlayingState.PlayingPaused)?.let {
+            getPrevTrack(it.track)?.let { track ->
+                mediaPlayerManager.play(track)
             }
         }
     }
 
-
     fun nextTrack() {
-        mediaPlayerManager.stop()
-
-        _currentPlayingState.value?.let { state ->
-            when (state) {
-                is PlayingState.PlayingPaused -> {
-                    repository.data.value?.tracks?.indexOf(state.track)
-                        ?.let { currentIndex ->
-                            repository.data.value?.tracks?.getOrNull(currentIndex + 1)
-                        }
-                        ?.let {
-                            _currentPlayingState.value = PlayingState.Playing(it)
-                            mediaPlayerManager.play(it)
-                        } ?: let {
-                        if (_loopPlaybackMode.value) {
-                            (data.value?.tracks?.firstOrNull())?.let {
-                                _currentPlayingState.value = PlayingState.Playing(it)
-                                mediaPlayerManager.play(it)
-                            }
-                        } else {
-                            _currentPlayingState.value = PlayingState.Stopped
-                        }
+        (currentPlayingState.value as? PlayingState.PlayingPaused)?.let {
+            getNextTrack(it.track)?.let { track ->
+                mediaPlayerManager.play(track)
+            } ?: let {
+                if (_loopPlaybackMode.value) {
+                    (data.value?.tracks?.firstOrNull())?.let { track ->
+                        mediaPlayerManager.play(track)
                     }
+                } else {
+                    mediaPlayerManager.stop()
                 }
-
-                is PlayingState.Stopped -> {}
             }
         }
     }
 
     fun pause() {
-        _currentPlayingState.value?.let { state ->
-            when (state) {
-                is PlayingState.Paused -> {}
-                is PlayingState.Playing -> {
-                    mediaPlayerManager.pause()
-                    _currentPlayingState.value = PlayingState.Paused(state.track)
-                }
-
-                PlayingState.Stopped -> {}
-            }
-        }
+        mediaPlayerManager.pause()
     }
 
     fun playPauseCommon() {
-        _currentPlayingState.value?.let { state ->
+        currentPlayingState.value?.let { state ->
             when (state) {
                 is PlayingState.Paused -> {
-                    _currentPlayingState.value = PlayingState.Playing(state.track)
-                    mediaPlayerManager.resume()
+                    mediaPlayerManager.play(state.track)
                 }
 
                 is PlayingState.Playing -> {
-                    _currentPlayingState.value = PlayingState.Paused(state.track)
                     mediaPlayerManager.pause()
                 }
 
                 PlayingState.Stopped -> {
                     (data.value?.tracks?.firstOrNull())?.let {
-                        _currentPlayingState.value = PlayingState.Playing(it)
                         mediaPlayerManager.play(it)
                     }
                 }
             }
-
-
         }
     }
 
     fun playPause(newTrack: MusicTrack) {
-        _currentPlayingState.value?.let { state ->
-            when (state) {
-                is PlayingState.Playing -> {
-                    if (state.track.id == newTrack.id) {
-                        _currentPlayingState.value =
-                            PlayingState.Paused(newTrack)
-                        mediaPlayerManager.pause()
-                    } else {
-                        _currentPlayingState.value =
-                            PlayingState.Playing(newTrack)
-                        mediaPlayerManager.play(newTrack)
-                    }
-                }
-
-                is PlayingState.Paused -> {
-                    if (state.track.id == newTrack.id) {
-                        _currentPlayingState.value =
-                            PlayingState.Playing(newTrack)
-                        mediaPlayerManager.resume()
-                    } else {
-                        _currentPlayingState.value =
-                            PlayingState.Playing(newTrack)
-                        mediaPlayerManager.play(newTrack)
-                    }
-                }
-
-                is PlayingState.Stopped -> {
-                    _currentPlayingState.value =
-                        PlayingState.Playing(newTrack)
-                    mediaPlayerManager.play(newTrack)
-                }
-            }
-        }
+        mediaPlayerManager.play(newTrack)
     }
 
     fun load() {
@@ -187,9 +131,3 @@ class MusicViewModel @Inject constructor(
     }
 }
 
-sealed class PlayingState() {
-    sealed class PlayingPaused(open val track: MusicTrack) : PlayingState()
-    class Playing(override val track: MusicTrack) : PlayingPaused(track)
-    class Paused(override val track: MusicTrack) : PlayingPaused(track)
-    object Stopped : PlayingState()
-}

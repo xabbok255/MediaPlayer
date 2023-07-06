@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.xabbok.mediaplayer.R
 import com.xabbok.mediaplayer.databinding.AlbumItemBinding
 import com.xabbok.mediaplayer.dto.MusicAlbum
+import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
-import com.xabbok.mediaplayer.presentation.viewmodels.PlayingState
 
 class MusicListViewAdapter(
     private val parent: AppCompatActivity

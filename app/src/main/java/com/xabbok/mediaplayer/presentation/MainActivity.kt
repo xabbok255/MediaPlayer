@@ -10,8 +10,8 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.xabbok.mediaplayer.R
 import com.xabbok.mediaplayer.adapter.MusicListViewAdapter
 import com.xabbok.mediaplayer.databinding.ActivityMainBinding
+import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
-import com.xabbok.mediaplayer.presentation.viewmodels.PlayingState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 

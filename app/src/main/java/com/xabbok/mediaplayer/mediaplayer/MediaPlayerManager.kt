@@ -1,6 +1,8 @@
 package com.xabbok.mediaplayer.mediaplayer
 
 import android.media.MediaPlayer
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.xabbok.mediaplayer.dto.MusicPlayingProgress
 import com.xabbok.mediaplayer.dto.MusicTrack
 import kotlinx.coroutines.CoroutineScope
@@ -11,6 +13,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlayer) {
+    private val _currentPlayingState: MutableLiveData<PlayingState> =
+        MutableLiveData(PlayingState.Stopped)
+
+    val currentPlayingState: LiveData<PlayingState>
+        get() = _currentPlayingState
+
     val playingProgressStateFlow: MutableStateFlow<MusicPlayingProgress> = MutableStateFlow(
         MusicPlayingProgress()
     )
@@ -48,29 +56,55 @@ class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlaye
     }
 
     fun seek(position: Float) {
-        mediaPlayer.seekTo((mediaPlayer.duration * position).toInt())
-    }
-
-    fun resume() {
-        mediaPlayer.start()
+        if (_currentPlayingState.value is PlayingState.PlayingPaused) {
+            mediaPlayer.seekTo((mediaPlayer.duration * position).toInt())
+        }
     }
 
     fun play(track: MusicTrack) {
-        mediaPlayer.setOnPreparedListener {
-            mediaPlayer.start()
-        }
 
-        mediaPlayer.reset()
-        mediaPlayer.setDataSource(track.withFullFileName().file)
-        mediaPlayer.prepareAsync()
+        (_currentPlayingState.value as? PlayingState.PlayingPaused)
+            ?.let { current ->
+                if (current.track.id == track.id) {
+                    if (current is PlayingState.Paused) {
+                        //resume
+                        mediaPlayer.start()
+                        _currentPlayingState.value = PlayingState.Playing(current.track)
+                    } else {
+                        pause()
+                    }
+                } else
+                    null
+            }
+            ?: let {
+                mediaPlayer.setOnPreparedListener {
+                    mediaPlayer.start()
+                    _currentPlayingState.value = PlayingState.Playing(track)
+                }
+
+                mediaPlayer.reset()
+                mediaPlayer.setDataSource(track.withFullFileName().file)
+                mediaPlayer.prepareAsync()
+            }
     }
 
     fun pause() {
-        mediaPlayer.pause()
+        (_currentPlayingState.value as? PlayingState.PlayingPaused)?.let {
+            mediaPlayer.pause()
+            _currentPlayingState.value = PlayingState.Paused(it.track)
+        }
     }
 
     fun stop() {
         mediaPlayer.reset()
+        _currentPlayingState.value = PlayingState.Stopped
         //mediaPlayer.release()
     }
+}
+
+sealed class PlayingState {
+    sealed class PlayingPaused(open val track: MusicTrack) : PlayingState()
+    class Playing(override val track: MusicTrack) : PlayingPaused(track)
+    class Paused(override val track: MusicTrack) : PlayingPaused(track)
+    object Stopped : PlayingState()
 }
