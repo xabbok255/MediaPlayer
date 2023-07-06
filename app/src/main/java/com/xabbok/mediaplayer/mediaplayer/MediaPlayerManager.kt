@@ -79,6 +79,7 @@ class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlaye
             ?: let {
                 mediaPlayer.setOnPreparedListener {
                     mediaPlayer.start()
+                    track.duration = mediaPlayer.duration
                     _currentPlayingState.value = PlayingState.Playing(track)
                 }
 
