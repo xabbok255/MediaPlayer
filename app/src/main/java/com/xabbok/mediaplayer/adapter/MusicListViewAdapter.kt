@@ -50,9 +50,13 @@ class MusicListViewAdapter(
             time.text = "15:12"
         }
 
-        holder.binding.playPauseButton.setOnClickListener {
+        val playOnClickListener = View.OnClickListener {
             viewModel.playPause(item)
         }
+
+        holder.binding.playPauseButton.setOnClickListener(playOnClickListener)
+        holder.binding.songName.setOnClickListener(playOnClickListener)
+        holder.binding.time.setOnClickListener(playOnClickListener)
 
         val observer: (value: PlayingState) -> Unit = {
             it.let { state ->
