@@ -14,6 +14,7 @@ import com.xabbok.mediaplayer.databinding.ActivityMainBinding
 import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
 import com.xabbok.mediaplayer.presentation.viewmodels.ScreenState
+import com.xabbok.mediaplayer.utils.formatTime
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -51,6 +52,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                         max = it.duration
                         progress = it.currentPos
                     }
+                }
+
+                binding.apply {
+                    currentPositionOfDuration.text = formatTime(it.currentPos)
+                    currentDuration.text = formatTime(it.duration)
                 }
             }
         }

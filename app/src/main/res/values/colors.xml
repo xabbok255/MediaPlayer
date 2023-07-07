@@ -5,4 +5,6 @@
     <color name="repeatButtonInactive">@android:color/darker_gray</color>
     <color name="listItemActiveBackground">#10000000</color>
     <color name="listItemBackground">#00000000</color>
+    <color name="progressbarBackgroundTint">#4DFFBB33</color>
+    <color name="progressbarProgressTextColor">@android:color/black</color>
 </resources>

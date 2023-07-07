@@ -126,14 +126,37 @@
         </LinearLayout>
     </FrameLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.ProgressBar.Horizontal"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:padding="8dp"
-        tools:max="100"
-        tools:progress="50" />
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:padding="8dp"
+            tools:max="100"
+            tools:progress="5" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/currentPositionOfDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start|center_vertical"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/progressbarProgressTextColor"
+            tools:text="15:25" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/currentDuration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/progressbarProgressTextColor"
+            tools:text="25:35" />
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

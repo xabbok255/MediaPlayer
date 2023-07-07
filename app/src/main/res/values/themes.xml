@@ -3,5 +3,6 @@
 
     <style name="Theme.MediaPlayer" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@color/statusBarColor</item>
+        <item name="android:progressBackgroundTint">@color/progressbarBackgroundTint</item>
     </style>
 </resources>
