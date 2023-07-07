@@ -139,8 +139,6 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                 val mouseX = event.x
                 val totalWidth = binding.progressBar.width.toFloat()
                 val progress = mouseX / totalWidth
-
-
                 viewModel.seek(progress)
             }
             true
