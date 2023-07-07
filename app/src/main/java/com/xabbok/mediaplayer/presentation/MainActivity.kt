@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                         binding.apply {
                             loadingIndicator.isVisible = false
                             errorLoadView.isVisible = true
+                            trackList.isVisible = false
                             errorTextView.text = state.message
 
                             repeatLoadButton.setOnClickListener {
@@ -111,6 +112,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                         binding.apply {
                             loadingIndicator.isVisible = false
                             errorLoadView.isVisible = false
+                            trackList.isVisible = true
                         }
                     }
 
@@ -118,6 +120,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                         binding.apply {
                             loadingIndicator.isVisible = true
                             errorLoadView.isVisible = false
+                            trackList.isVisible = false
                         }
                     }
                 }
