@@ -11,7 +11,10 @@ import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.repository.AlbumRepository
 import com.xabbok.mediaplayer.service.MediaInfoService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,6 +28,11 @@ class MusicViewModel @Inject constructor(
     private val mediaInfoService: MediaInfoService
 ) : ViewModel() {
     val data: LiveData<MusicAlbum> = repository.data
+
+    private val _screenState =
+        MutableSharedFlow<ScreenState>().also { it.tryEmit(ScreenState.Normal) }
+    val screenState: SharedFlow<ScreenState>
+        get() = _screenState
 
     val currentPlayingState: LiveData<PlayingState> = mediaPlayerManager.currentPlayingState
 
@@ -40,6 +48,10 @@ class MusicViewModel @Inject constructor(
                 nextTrack()
             }
         })
+    }
+
+    private suspend fun changeState(newState: ScreenState) {
+        _screenState.emit(newState)
     }
 
     fun processMediaDurationInfo(inputTrack: MusicTrack) {
@@ -134,8 +146,17 @@ class MusicViewModel @Inject constructor(
 
     fun load() {
         viewModelScope.launch {
-            repository.load()
+            runCatching {
+                changeState(ScreenState.Loading)
+                delay(1000)
+                repository.load()
+            }.onFailure {
+                changeState(ScreenState.Error("Ошибка загрузки списка") {
+                    load()
+                })
+            }.onSuccess {
+                changeState(ScreenState.Normal)
+            }
         }
     }
 }
-

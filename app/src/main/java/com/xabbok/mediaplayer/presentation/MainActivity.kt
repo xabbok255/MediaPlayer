@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.MotionEvent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.xabbok.mediaplayer.R
@@ -12,6 +13,7 @@ import com.xabbok.mediaplayer.adapter.MusicListViewAdapter
 import com.xabbok.mediaplayer.databinding.ActivityMainBinding
 import com.xabbok.mediaplayer.mediaplayer.PlayingState
 import com.xabbok.mediaplayer.presentation.viewmodels.MusicViewModel
+import com.xabbok.mediaplayer.presentation.viewmodels.ScreenState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -79,6 +81,38 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
                     PlayingState.Stopped -> {
                         binding.playPauseButtonBottom.setImageResource(R.drawable.play_button)
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.screenState.collect { state ->
+                when (state) {
+                    is ScreenState.Error -> {
+                        binding.apply {
+                            loadingIndicator.isVisible = false
+                            errorLoadView.isVisible = true
+                            errorTextView.text = state.message
+
+                            repeatLoadButton.setOnClickListener {
+                                state.repeatAction?.invoke()
+                            }
+                        }
+                    }
+
+                    ScreenState.Normal -> {
+                        binding.apply {
+                            loadingIndicator.isVisible = false
+                            errorLoadView.isVisible = false
+                        }
+                    }
+
+                    ScreenState.Loading -> {
+                        binding.apply {
+                            loadingIndicator.isVisible = true
+                            errorLoadView.isVisible = false
+                        }
                     }
                 }
             }

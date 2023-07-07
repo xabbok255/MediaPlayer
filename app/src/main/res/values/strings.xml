@@ -4,4 +4,5 @@
     <string name="play_audio">Play audio</string>
     <string name="album">АЛЬБОМ</string>
     <string name="artist">Исполнитель:</string>
+    <string name="repeat_button_text">Повторить</string>
 </resources>

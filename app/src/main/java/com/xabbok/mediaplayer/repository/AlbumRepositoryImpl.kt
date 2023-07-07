@@ -32,7 +32,7 @@ class AlbumRepositoryImpl @Inject constructor(
         }.onSuccess {
             _data.postValue(it)
         }.onFailure {
-            it.printStackTrace()
+            throw it
         }
     }
 
