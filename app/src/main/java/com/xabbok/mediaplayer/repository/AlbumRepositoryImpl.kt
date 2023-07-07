@@ -13,7 +13,7 @@ import javax.inject.Inject
 class AlbumRepositoryImpl @Inject constructor(
     @ApplicationContext
     context: Context,
-    val api: ApiService,
+    private val api: ApiService,
 ) : AlbumRepository {
 
     private val _data: MutableLiveData<MusicAlbum> = MutableLiveData()
@@ -39,6 +39,5 @@ class AlbumRepositoryImpl @Inject constructor(
     override fun setTrackDuration(track: MusicTrack, duration: Int) {
         data.value?.tracks?.single { it.id == track.id }?.duration = duration
         _data.postValue(_data.value?.copy())
-
     }
 }

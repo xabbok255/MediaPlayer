@@ -99,13 +99,5 @@ class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlaye
     fun stop() {
         mediaPlayer.reset()
         _currentPlayingState.value = PlayingState.Stopped
-        //mediaPlayer.release()
     }
-}
-
-sealed class PlayingState {
-    sealed class PlayingPaused(open val track: MusicTrack) : PlayingState()
-    class Playing(override val track: MusicTrack) : PlayingPaused(track)
-    class Paused(override val track: MusicTrack) : PlayingPaused(track)
-    object Stopped : PlayingState()
 }
