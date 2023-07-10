@@ -11,7 +11,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class MediaPlayerManager @Inject constructor(private val mediaPlayer: MediaPlayer) {
     private val _currentPlayingState: MutableLiveData<PlayingState> =
         MutableLiveData(PlayingState.Stopped)
