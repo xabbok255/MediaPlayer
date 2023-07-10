@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.max
@@ -32,13 +34,13 @@ class MusicViewModel @Inject constructor(
     private val _screenState =
         MutableSharedFlow<ScreenState>().also { it.tryEmit(ScreenState.Normal) }
     val screenState: SharedFlow<ScreenState>
-        get() = _screenState
+        get() = _screenState.asSharedFlow()
 
     val currentPlayingState: LiveData<PlayingState> = mediaPlayerManager.currentPlayingState
 
     private val _loopPlaybackMode = MutableStateFlow<Boolean>(false)
     val loopPlaybackMode: StateFlow<Boolean>
-        get() = _loopPlaybackMode
+        get() = _loopPlaybackMode.asStateFlow()
 
     val playingProgressStateFlow = mediaPlayerManager.playingProgressStateFlow
 
