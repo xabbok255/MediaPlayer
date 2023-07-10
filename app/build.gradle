@@ -49,10 +49,9 @@ afterEvaluate {
 }
 
 dependencies {
-    //ffmpeg
-    def ffmpeg_version = "1.0.19"
-    implementation "com.github.wseemann:FFmpegMediaMetadataRetriever-core:$ffmpeg_version"
-    implementation "com.github.wseemann:FFmpegMediaMetadataRetriever-native:$ffmpeg_version"
+    //media3-exoplayer
+    def media3_version = "1.1.0"
+    implementation("androidx.media3:media3-exoplayer:$media3_version")
 
     //lifecycle
     def lifecycle_version = "2.5.1"
